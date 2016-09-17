@@ -1,10 +1,10 @@
 {
-  "name": "saba",
+  "name": "soba",
   "version": "1.0.0",
   "description": "Starter theme for Kirby",
   "repository": {
     "type": "git",
-    "url": "github.com/corygibbons/saba"
+    "url": "github.com/corygibbons/soba"
   },
   "author": "Cory Gibbons",
   "devDependencies": {

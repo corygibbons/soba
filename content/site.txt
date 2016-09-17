@@ -1,4 +1,4 @@
-Title: Saba
+Title: Soba
 
 ----
 
@@ -10,7 +10,7 @@ Description: Starter theme for Kirby
 
 ----
 
-Keywords: Kirby, CMS, file-based, Saba
+Keywords: Kirby, CMS, file-based, Soba
 
 ----
 

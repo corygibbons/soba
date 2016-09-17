@@ -9,7 +9,7 @@ var plumber = require('gulp-plumber');
 
 gulp.task('default', ['stylus'], function() {
   browserSync.init({
-    proxy: "sa.ba"
+    proxy: "so.ba"
   });
   gulp.watch('src/stylus/**/*.styl', ['stylus']);
   gulp.watch(['*.twig', '**/*.twig']).on('change', browserSync.reload);
