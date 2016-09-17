@@ -1,0 +1,17 @@
+Title: Saba
+
+----
+
+Author: Cory Gibbons
+
+----
+
+Description: Starter theme for Kirby
+
+----
+
+Keywords: Kirby, CMS, file-based, Saba
+
+----
+
+Copyright: © 2009-(date: Year) (link: http://getkirby.com text: Kirby)

@@ -1,0 +1,23 @@
+{% extends "partials/layout.twig" %}
+
+{% block content %}
+
+  <h1>{{ page.title }}</h1>
+  {{ page.text.kirbytext | raw }}
+
+  <hr>
+
+  <h2>Latest Projects</h2>
+
+  {% for project in page.children.visible.limit(3) %}
+    <li>
+      <h3><a href="{{ project.url }}">{{ project.title }}</a></h3>
+      <p>{{ project.text.excerpt(80) }}</p>
+      <a href="{{ project.url }}">read more →</a>
+      <a href="{{ project.url }}">
+        <img src="{{ project.images.first.url() }}" alt="{{ project.title }}">
+      </a>
+    </li>
+  {% endfor %}
+
+{% endblock %}

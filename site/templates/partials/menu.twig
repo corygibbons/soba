@@ -1,0 +1,14 @@
+<nav class="menu">
+  <ul class="nav">
+    {% for p in pages.visible %}
+      <li><a {{ p.isOpen() ? 'class="active"' : '' }} href="{{ p.url }}">{{ p.title }}</a></li>
+      {% if p.hasVisibleChildren() %}
+        <ul class="submenu">
+          {% for p in pages.children.visible %}
+            <li><a href="{{ p.url }}">{{ p.title }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</nav>

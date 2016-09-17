@@ -1,0 +1,31 @@
+{% extends "partials/layout.twig" %}
+
+{% block content %}
+
+  <h1>{{ page.title }}</h1>
+
+  <ul class="meta">
+    <li><b>Year:</b> <time>{{ page.year }}</time></li>
+    <li><b>Tags:</b> {{ page.tags }}</li>
+  </ul>
+
+  <div class="text">
+    {{ page.text.kirbytext | raw }}
+
+    {% for image in page.images %}
+      <figure>
+        <img src="{{ image.url() }}" alt="{{ page.title }}">
+      </figure>
+    {% endfor %}
+  </div>
+
+  <nav>
+    {% if page.prevVisible() %}
+      <a class="prev" href="{{ page.prevVisible().url }}">&larr; previous</a>
+    {% endif %}
+    {% if page.nextVisible() %}
+      <a class="next" href="{{ page.nextVisible().url }}">next &rarr;</a>
+    {% endif %}
+  </nav>
+
+{% endblock %}

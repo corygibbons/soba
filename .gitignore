@@ -1,0 +1,5 @@
+.DS_Store
+/site/accounts
+/assets/avatars
+/thumbs/*
+/node_modules
