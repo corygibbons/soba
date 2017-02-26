@@ -1,86 +1,157 @@
-Exposing functions and classes to Twig templates
-================================================
+Using your own functions in templates
+=====================================
 
 
-If you need to expose more PHP functions or classes to your Twig templates, you can list them with those two options:
+If you need to expose PHP functions (or static class methods) to your Twig templates, you can list them with those options:
 
--   `twig.env.functions` (for functions or static methods of classes)
--   `twig.env.classes` (for classes, which must be instantiated with a `new()` Twig function)
+- `twig.function.*`
+- `twig.filter.*`
+
+As with any option in Kirby, you should define these options in your `site/config/config.php`. Let’s show how each option works.
 
 
 Exposing a function
 -------------------
 
-For example if you have a custom function defined in your own plugin file:
+The expected syntax for these configuration options is:
 
 ```php
-<?php // site/plugins/myplugin.php
+// In site/config/config.php:
+c::set('twig.function.myFunctionName', $someFunction);
+```
 
-function myFunction() {
-    return 'Hello';
+Where:
+
+-   `myFunctionName` is any name you want (only letters and underscores), and is the name that will be available in your Twig templates.
+-   `$someFunction` can be a string, or a Closure.
+
+Let’s use more tangible examples.
+
+### Using a function name (string)
+
+If you have a custom function defined in a plugin file (e.g. `site/plugins/myplugin.php`):
+
+```php
+<?php
+/**
+ * Returns a welcoming message
+ * @param  string $who
+ * @return string
+ */
+function sayHello($who='') {
+  return 'Hello' . (is_string($who) ? ' ' . $who : '');
 }
 ```
 
-You could tell the Twig plugin to make it available in your templates:
+You can make it available as a Twig function:
 
 ```php
-<?php // site/config/config.php
-c::set('twig.env.functions', ['myFunction']);
+c::set('twig.function.sayHello', 'sayHello');
 ```
 
 ```twig
-{# Prints 'Hello' #}
-{{ myFunction() }}
+{# Prints 'Hello Jane' #}
+{{ sayHello('Jane') }}
 ```
 
-
-Exposing static methods
------------------------
-
-If you just need a couple static methods, you can use the same solution:
+Or you could expose it as a Twig filter:
 
 ```php
-<?php // site/config/config.php
-c::set('twig.env.functions', ['cookie::set', 'cookie::get']);
+c::set('twig.filter.sayHello', 'sayHello');
 ```
 
-Note that the `::` will be replaced by two underscores (`__`).
+```twig
+{# Prints 'Hello Jane' #}
+{{ 'Jane'|sayHello }}
+```
+
+I recommend sticking to the Twig function syntax, and only using Twig’s built-in filters. Of course, you should do what you like best.
+
+### Using an anonymous function
+
+The `twig.function.*` and `twig.filter.*` configs accept anonymous functions (called closures in PHP):
+
+```php
+c::set('twig.function.sayHello', function($who='') {
+    return 'Hello' . (is_string($who) ? ' ' . $who : '');
+}
+```
+
+### Exposing static methods
+
+You can also expose static methods, using the string syntax:
+
+```php
+c::set('twig.function.setCookie', 'Cookie::set');
+c::set('twig.function.getCookie', 'Cookie::get');
+```
 
 ```twig
-{% do cookie__set('test', 'real value') %}
+{% do setCookie('test', 'real value') %}
 
 {# Prints 'real value' #}
-{{ cookie__get('test', 'fallback') }}
+{{ getCookie('test', 'fallback') }}
 ```
 
 
 Exposing and using classes
 --------------------------
 
-First you need to whitelist the class(es) you want to be able to instantiate:
+**Breaking change:** Previous versions of Kirby Twig allowed instantiating PHP classes with a `new()` Twig function. This feature was removed in Kirby Twig 3.0.
+
+If you need to use PHP classes in your templates, I recommend two approaches:
+
+1. Do it in a controller instead, and feed the resulting content to your templates. (Kirby documentation: [https://getkirby.com/docs/developer-guide/advanced/controllers](Controllers).)
+2. Write a custom function that returns a class instance.
+
+Let’s look at an example of that second solution:
 
 ```php
-<?php // site/config/config.php
-c::set('twig.env.classes', ['cookie', 'str']);
+// site/plugins/coolplugin/src/verycoolthing.php
+class VeryCoolThing
+{
+  // class implementation
+}
+
+// site/config/config.php
+c::set('twig.function.getCoolStuff', function(){
+  return new VeryCoolThing();
+});
 ```
 
-You can now use the `new()` *function* to instantiate a class.
+Then in your templates, you can use that function to get a class instance:
 
 ```twig
-{% set cookie = new('cookie') %}
-{% do cookie.set('test', 'real value') %}
-
-{# Prints 'real value' #}
-{{ cookie.get('test', 'fallback') }}
-
-{# Prints 'salut-ca-va' #}
-{{ new('str').slug('Salut ça va?') }}
+{% set coolThing = getCoolStuff() %}
 ```
 
-If the class constructor takes parameters, you can provide them after the first parameter:
+This example is simplistic; in practice, you might need to pass some parameters around to instanciate your class.
+
+Alternatively, you could define and expose a generic function that allows instantiating any (known) PHP class:
+
+```php
+// site/config/config.php
+
+/**
+ * Make a class instance for the provided class name and parameters
+ * Giving this function the name 'new' in Twig templates, for
+ * backwards compatibility with Kirby Twig 2.x.
+ */
+c::set('twig.function.new', function($name) {
+  if (!class_exists($name)) {
+    throw new Twig_Error_Runtime("Unknown class \"$name\"");
+  }
+  $args = array_slice(func_get_args(), 1);
+  if (count($args) > 0) {
+    $reflected = new ReflectionClass($name);
+    return $reflected->newInstanceArgs($args);
+  }
+  return new $name;
+});
+```
+
+Then in Twig templates:
 
 ```twig
-{% set something = new('something', param1, param2) %}
+{% set coolThing = new('VeryCoolThing') %}
 ```
-
-Finally, note that you probably *should not need to use classes* in templates. If you have a lot of programming-like work to do in a template, you should probably do that work in a controller instead.

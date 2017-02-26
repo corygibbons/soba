@@ -1,20 +1,14 @@
 <?php
 
-if (c::get('twig', false)) {
+/**
+ * @package Kirby Twig Plugin
+ * @file Main plugin file when installed manually or with Kirby’s CLI; not used with Composer.
+ */
 
-	if (!class_exists('Kirby\Component\Template')) {
-		throw new Exception('Twig plugin requires Kirby 2.3 or higher. Current version: ' . kirby()->version());
-	}
-	if (!class_exists('Twig_Environment')) {
-		if (file_exists($loader = __DIR__.'/lib/Twig/Twig/Autoloader.php')) {
-			require_once $loader;
-			\Twig_Autoloader::register();
-		} else {
-			throw new Exception('Twig plugin: cannot find the Twig library');
-		}
-	}
+load([
+    'kirby\twig\plugin'        => __DIR__.'/src/Plugin.php',
+    'kirby\twig\twigcomponent' => __DIR__.'/src/TwigComponent.php',
+    'kirby\twig\twigenv'       => __DIR__.'/src/TwigEnv.php'
+]);
 
-	require_once __DIR__ . '/src/component.php';
-	kirby()->set('component', 'template', 'Kirby\Plugin\Twig\TwigComponent');
-
-}
+Kirby\Twig\Plugin::register();
