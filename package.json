@@ -2,19 +2,27 @@
   "name": "soba",
   "version": "1.0.0",
   "description": "Starter theme for Kirby",
+  "author": "Cory Gibbons",
   "repository": {
     "type": "git",
     "url": "github.com/corygibbons/soba"
   },
-  "author": "Cory Gibbons",
+  "scripts": {
+    "start": "npm-run-all --parallel php browsersync watch:css",
+    "watch": "npm-run-all --parallel browsersync watch:css",
+    "build:css": "postcss src/css/index.css -o assets/css/style.css",
+    "watch:css": "npm run build:css -- -w",
+    "browsersync": "browser-sync start --config browsersync.config.js",
+    "php": "php -S 127.0.0.1:1234"
+  },
   "devDependencies": {
-    "browser-sync": "^2.16.0",
-    "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^3.1.1",
-    "gulp-clean-css": "^2.0.12",
-    "gulp-notify": "^2.2.0",
-    "gulp-plumber": "^1.1.0",
-    "gulp-stylus": "^2.5.0",
-    "normalize.css": "^4.2.0"
+    "browser-sync": "^2.18.13",
+    "normalize.css": "^7.0.0",
+    "npm-run-all": "^4.1.1",
+    "postcss-cli": "^4.1.0",
+    "postcss-cssnext": "^3.0.2",
+    "postcss-easy-import": "^2.1.0",
+    "postcss-scss": "^1.0.2",
+    "postcss-simple-vars": "^4.1.0"
   }
 }

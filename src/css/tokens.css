@@ -1,0 +1,9 @@
+$color-background: white;
+
+$color-text: #535353;
+$color-text-emphasis: color($color-text lightness(-10%));
+$color-text-subdued: color($color-text lightness(20%));
+
+$font-family: -apple-system, Roboto, Helvetica, sans-serif;
+
+$line-height: 1.4;

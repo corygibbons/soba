@@ -1,0 +1,14 @@
+body {
+  background-color: $color-background;
+  font-family: $font-family;
+  color: $color-text;
+  line-height: $line-height;
+}
+
+a {
+  color: $color-text-emphasis;
+}
+
+img {
+  max-width: 100%;
+}
