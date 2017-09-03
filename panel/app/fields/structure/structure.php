@@ -11,12 +11,15 @@ class StructureField extends BaseField {
     )
   );
 
+  public $default   = array();
   public $fields    = array();
   public $entry     = null;
   public $structure = null;
   public $style     = 'items';
   public $modalsize = 'medium';
   public $limit     = null;
+  public $sort      = null;
+  public $flip      = false;
 
   public function routes() {
 
@@ -54,11 +57,23 @@ class StructureField extends BaseField {
     return in_array($this->style, $styles) ? $this->style : 'items';
   }
 
+  public function sort() {
+    return $this->sort ? str::split($this->sort) : false;
+  }
+
+  public function flip() {
+    return $this->flip === true ? true : false;
+  }
+
+  public function sortable() {
+    return !$this->readonly() && !$this->sort() && !$this->flip();
+  }
+
   public function structure() {
     if(!is_null($this->structure)) {
       return $this->structure;
     } else {
-      return $this->structure = $this->model->structure()->forField($this->name);      
+      return $this->structure = $this->model->structure()->forField($this->name, $this->value());
     }
   }
 
@@ -66,9 +81,21 @@ class StructureField extends BaseField {
 
     $output = array();
 
-    foreach($this->structure->fields() as $k => $v) {
-      $v['name']  = $k;
-      $v['value'] = '{{' . $k . '}}';
+    // use the configured fields if available
+    $fieldData = $this->structure->fields();
+    $fields = $this->entry;
+    if(!is_array($fields)) {
+      // fall back to all existing fields
+      $fields = array_keys($fieldData);
+    }
+
+    foreach($fields as $f) {
+      if(!isset($fieldData[$f])) continue;
+      $v = $fieldData[$f];
+
+      $v['name']  = $f;
+      $v['value'] = '{{' . $f . '}}';
+
       $output[] = $v;
     }
 
@@ -77,7 +104,16 @@ class StructureField extends BaseField {
   }
 
   public function entries() {
-    return $this->structure()->data();
+    $entries = $this->structure()->data();
+
+    if($sort = $this->sort()) {
+      $entries = call([$entries, 'sortBy'], $sort);
+    }
+    if($this->flip()) {
+      $entries = $entries->flip();
+    }
+
+    return $entries;
   }
 
   public function result() {  
